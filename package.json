@@ -1,19 +1,22 @@
 {
-	"name": "tsdown-starter",
+	"name": "neis-school-info",
 	"version": "0.0.0",
-	"description": "A starter for creating a TypeScript package.",
-	"homepage": "https://github.com/user/repo#readme",
+	"description": "대한민국 학교 기본 정보 조회 (나이스 Open API 기반)",
+	"homepage": "https://github.com/hyunbinseo/neis-school-info#readme",
 	"bugs": {
-		"url": "https://github.com/user/repo/issues"
+		"url": "https://github.com/hyunbinseo/neis-school-info/issues"
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/user/repo.git"
+		"url": "git+https://github.com/hyunbinseo/neis-school-info.git"
 	},
 	"files": [
 		"dist"
 	],
 	"type": "module",
+	"imports": {
+		"#src/*": "./src/*"
+	},
 	"exports": {
 		".": "./dist/index.js",
 		"./package.json": "./package.json"
@@ -21,11 +24,15 @@
 	"scripts": {
 		"prepack": "tsdown",
 		"version": "tsdown && git add package.json",
+		"test": "node --env-file=.env --test",
 		"check": "tsc --noEmit",
 		"fmt": "oxfmt",
 		"fmt:check": "oxfmt --check",
 		"lint": "oxlint",
 		"lint:fix": "oxlint --fix"
+	},
+	"dependencies": {
+		"valibot": "^1.4.2"
 	},
 	"devDependencies": {
 		"@arethetypeswrong/core": "^0.18.5",
@@ -35,5 +42,6 @@
 		"publint": "^0.3.21",
 		"tsdown": "^0.22.8",
 		"typescript": "^7.0.2"
-	}
+	},
+	"packageManager": "pnpm@11.13.1+sha512.b2fc7683b8a6525414e7d13e1ba28caaddde96bf66ec540bfaeb7e702b81f3e0be4d1f295edf7f9fe0396740a8dce4509c582ddf79891f4543fea32d37645f25"
 }
