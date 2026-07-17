@@ -14,14 +14,14 @@ test('기본 검색', async () => {
 
 	const school = result.schools.at(0);
 	assert.ok(school);
-	assert.equal(school.SCHUL_NM, '가락고등학교');
+	assert.equal(school.학교명, '가락고등학교');
 });
 
 test('검색 시 지정한 필드만 반환', async () => {
 	const result = await search(
 		{
 			filters: { 학교명: '가락고등학교' },
-			fields: ['SCHUL_NM', 'ORG_TELNO'],
+			fields: ['학교명', '전화번호'],
 		},
 		{ apiKey },
 	);
@@ -29,7 +29,7 @@ test('검색 시 지정한 필드만 반환', async () => {
 
 	const school = result.schools.at(0);
 	assert.ok(school);
-	assert.deepEqual(Object.keys(school).sort(), ['ORG_TELNO', 'SCHUL_NM']);
+	assert.deepEqual(Object.keys(school).sort(), ['전화번호', '학교명']);
 });
 
 test('검색 결과가 없는 경우', async () => {

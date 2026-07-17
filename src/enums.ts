@@ -38,34 +38,36 @@ export const OFFICE_CODES = [
 	'V10',
 ] as const;
 
-export type SchoolField = (typeof SCHOOL_FIELDS)[number];
-export const SCHOOL_FIELDS = [
-	'ATPT_OFCDC_SC_CODE',
-	'ATPT_OFCDC_SC_NM',
-	'SD_SCHUL_CODE',
-	'SCHUL_NM',
-	'ENG_SCHUL_NM',
-	'SCHUL_KND_SC_NM',
-	'LCTN_SC_NM',
-	'JU_ORG_NM',
-	'FOND_SC_NM',
-	'ORG_RDNZC',
-	'ORG_RDNMA',
-	'ORG_RDNDA',
-	'ORG_TELNO',
-	'HMPG_ADRES',
-	'COEDU_SC_NM',
-	'ORG_FAXNO',
-	'HS_SC_NM',
-	'INDST_SPECL_CCCCL_EXST_YN',
-	'HS_GNRL_BUSNS_SC_NM',
-	'SPCLY_PURPS_HS_ORD_NM',
-	'ENE_BFE_SEHF_SC_NM',
-	'DGHT_SC_NM',
-	'FOND_YMD',
-	'FOAS_MEMRD',
-	'LOAD_DTM',
-] as const;
+export const SCHOOL_FIELD_EN_TO_KO = {
+	ATPT_OFCDC_SC_CODE: '시도교육청코드',
+	ATPT_OFCDC_SC_NM: '시도교육청명',
+	SD_SCHUL_CODE: '행정표준코드',
+	SCHUL_NM: '학교명',
+	ENG_SCHUL_NM: '영문학교명',
+	SCHUL_KND_SC_NM: '학교종류명',
+	LCTN_SC_NM: '시도명',
+	JU_ORG_NM: '관할조직명',
+	FOND_SC_NM: '설립명',
+	ORG_RDNZC: '도로명우편번호',
+	ORG_RDNMA: '도로명주소',
+	ORG_RDNDA: '도로명상세주소',
+	ORG_TELNO: '전화번호',
+	HMPG_ADRES: '홈페이지주소',
+	COEDU_SC_NM: '남녀공학구분명',
+	ORG_FAXNO: '팩스번호',
+	HS_SC_NM: '고등학교구분명',
+	INDST_SPECL_CCCCL_EXST_YN: '산업체특별학급존재여부',
+	HS_GNRL_BUSNS_SC_NM: '고등학교일반전문구분명',
+	SPCLY_PURPS_HS_ORD_NM: '특수목적고등학교계열명',
+	ENE_BFE_SEHF_SC_NM: '입시전후기구분명',
+	DGHT_SC_NM: '주야구분명',
+	FOND_YMD: '설립일자',
+	FOAS_MEMRD: '개교기념일',
+	LOAD_DTM: '수정일자',
+} as const;
+
+export type EnSchoolField = keyof typeof SCHOOL_FIELD_EN_TO_KO;
+export const EN_SCHOOL_FIELDS = Object.keys(SCHOOL_FIELD_EN_TO_KO) as EnSchoolField[];
 
 export const FILTER_KEY_TO_SEARCH = {
 	시도교육청코드: 'ATPT_OFCDC_SC_CODE',

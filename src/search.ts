@@ -1,7 +1,7 @@
-import { array, object, parse, pick, safeParse, strictObject, tuple } from 'valibot';
+import { array, object, parse, pick, pipe, safeParse, strictObject, tuple } from 'valibot';
 import { FILTER_KEY_TO_SEARCH, FILTER_KEYS, type FailureCode, type SuccessCode } from './enums.ts';
 import type { Filters, SchoolFields } from './params.ts';
-import { HeadSchema, NoRowsSchema, SchoolSchema, type School } from './valibot.ts';
+import { HeadSchema, NoRowsSchema, RawSchoolSchema, SchoolSchema, type School } from './valibot.ts';
 
 export type SuccessResult<Fields extends SchoolFields = never> = {
 	ok: true;
@@ -71,9 +71,12 @@ export const search = async <const Fields extends SchoolFields = never>(
 				object({ head: HeadSchema }),
 				object({
 					row: array(
-						params.fields //
-							? pick(SchoolSchema, params.fields)
-							: SchoolSchema,
+						pipe(
+							RawSchoolSchema,
+							params.fields //
+								? pick(SchoolSchema, params.fields)
+								: SchoolSchema,
+						),
 					),
 				}),
 			]),
