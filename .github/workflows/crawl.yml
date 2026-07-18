@@ -1,0 +1,25 @@
+name: Crawl Schools
+
+on:
+  workflow_dispatch:
+  # TODO Add schedule after initial issues are resolved
+
+permissions:
+  issues: write
+
+jobs:
+  crawl:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/setup@v1
+        with:
+          runtime: node@lts
+      - run: node cli/scripts/crawl.ts
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          NEIS_API_KEY: ${{ secrets.NEIS_API_KEY }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: crawled-${{ github.run_id }}
+          path: cli/scripts/crawled-*.json

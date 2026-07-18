@@ -37,6 +37,7 @@
 	"devDependencies": {
 		"@arethetypeswrong/core": "^0.18.5",
 		"@types/node": "^24.13.3",
+		"markdown-table": "^3.0.4",
 		"oxfmt": "^0.59.0",
 		"oxlint": "^1.74.0",
 		"publint": "^0.3.21",
