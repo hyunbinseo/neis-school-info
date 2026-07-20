@@ -131,36 +131,6 @@ if (시도_불일치.length > 0) {
 	);
 }
 
-type 특목고_Header = (typeof 특목고_Headers)[number];
-const 특목고_Headers = [
-	'학교명',
-	'행정표준코드',
-	'고등학교구분명',
-	'특수목적고등학교계열명',
-] as const;
-
-const 특목고_불일치 = result.output.flatMap<Record<특목고_Header, string | null>>((school) => {
-	if ((school.고등학교구분명 === '특목고') === (school.특수목적고등학교계열명 !== null)) return [];
-	return {
-		학교명: school.학교명,
-		행정표준코드: school.행정표준코드,
-		고등학교구분명: school.고등학교구분명,
-		특수목적고등학교계열명: school.특수목적고등학교계열명,
-	};
-});
-
-if (특목고_불일치.length > 0) {
-	console.table(특목고_불일치);
-	issueSections.push(
-		'## 특목고 불일치',
-		'고등학교구분명이 특목고인데 특수목적고등학교계열명이 없거나, 특목고가 아닌데 있음',
-		markdownTable([
-			특목고_Headers,
-			...특목고_불일치.map((row) => 특목고_Headers.map((header) => row[header] ?? '')),
-		]),
-	);
-}
-
 if (issueSections.length) {
 	const title = `데이터 불일치 발견 (${new Date().toISOString().slice(0, 10)})`;
 	const body = (await format('issue.md', issueSections.join('\n\n'))).code;
