@@ -1,6 +1,7 @@
 import {
 	digits,
 	entriesFromList,
+	fallback,
 	type InferOutput,
 	isoDate,
 	length,
@@ -57,7 +58,7 @@ export const RawSchoolSchema = pipe(
 
 const TrimStringAndIsNonEmpty = pipe(string(), trim(), nonEmpty());
 
-export const TrimStringAndEmtpyToNull = pipe(
+const TrimStringAndEmptyToNull = pipe(
 	string(),
 	trim(),
 	transform((v) => v || null),
@@ -110,16 +111,16 @@ export type School = InferOutput<typeof SchoolSchema>;
 export const SchoolSchema = object({
 	시도교육청코드: picklist(OFFICE_CODES),
 	시도교육청명: TrimStringAndIsNonEmpty,
-	행정표준코드: TrimStringAndEmtpyToNull,
+	행정표준코드: TrimStringAndEmptyToNull,
 	학교명: TrimStringAndIsNonEmpty,
-	영문학교명: nullable(TrimStringAndEmtpyToNull),
+	영문학교명: nullable(TrimStringAndEmptyToNull),
 	학교종류명: nullable(pipe(TrimStringAndIsNonEmpty, picklist(학교종류명))),
 	시도명: TrimStringAndIsNonEmpty,
 	관할조직명: TrimStringAndIsNonEmpty,
 	설립명: nullable(pipe(TrimStringAndIsNonEmpty, picklist(설립명))),
-	도로명우편번호: nullable(TrimStringAndEmtpyToNull),
+	도로명우편번호: fallback(nullable(pipe(string(), trim(), digits(), length(5))), null),
 	도로명주소: nullable(TrimStringAndIsNonEmpty),
-	도로명상세주소: nullable(TrimStringAndEmtpyToNull),
+	도로명상세주소: nullable(TrimStringAndEmptyToNull),
 	전화번호: TrimStringAndIsNonEmpty,
 	홈페이지주소: nullable(TrimStringAndIsNonEmpty),
 	남녀공학구분명: pipe(TrimStringAndIsNonEmpty, picklist(남녀공학구분명)),
