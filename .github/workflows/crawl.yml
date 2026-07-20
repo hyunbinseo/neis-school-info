@@ -19,7 +19,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
           NEIS_API_KEY: ${{ secrets.NEIS_API_KEY }}
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: crawled-${{ github.run_id }}
           path: cli/scripts/crawled-*.json
