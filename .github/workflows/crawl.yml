@@ -2,7 +2,8 @@ name: Crawl Schools
 
 on:
   workflow_dispatch:
-  # TODO Add schedule after initial issues are resolved
+  schedule:
+    - cron: '0 18 * * *' # 03:00 KST
 
 permissions:
   issues: write
