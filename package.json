@@ -15,6 +15,7 @@
 	],
 	"type": "module",
 	"imports": {
+		"#cli/*": "./cli/*",
 		"#src/*": "./src/*"
 	},
 	"exports": {

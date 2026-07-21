@@ -1,9 +1,7 @@
-import { deepStrictEqual } from 'node:assert/strict';
 import { writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { env, exit } from 'node:process';
 import { markdownTable } from 'markdown-table';
-import { format } from 'oxfmt';
 import {
 	array,
 	entriesFromList,
@@ -15,10 +13,11 @@ import {
 	tuple,
 	unknown,
 } from 'valibot';
+import { OFFICE_CODE_TO_NAMES } from '#cli/enum.ts';
+import { createIssue, jsonToCodeblock } from '#cli/lib/github-issue.ts';
 import { EN_SCHOOL_FIELDS, type EnSchoolField } from '#src/enums.ts';
 import { HeadSchema, RawSchoolSchema, SchoolSchema } from '#src/valibot.ts';
-import { OFFICE_CODE_TO_NAMES } from '../enum.ts';
-import { SCHOOL_FIELD_TYPES } from './crawl.valibot.ts';
+import { SCHOOL_FIELD_CHARACTERISTICS } from './crawl.valibot.ts';
 
 const PAGE_SIZE = 1000;
 
@@ -58,10 +57,13 @@ while (true) {
 	pageIndex += 1;
 }
 
-const timestamp = Date.now();
+const now = new Date();
+
+const issueTitle = `데이터 검증 오류 (${now.toISOString().slice(0, 10)})`;
+const issueSections: string[] = [];
 
 writeFileSync(
-	join(import.meta.dirname, `crawled-${timestamp}.raw.json`),
+	join(import.meta.dirname, `crawled-${now.getTime()}.raw.json`),
 	JSON.stringify(rawSchools, null, '\t') + '\n',
 );
 
@@ -77,26 +79,47 @@ const actualFieldCharacteristics = Object.fromEntries(
 		});
 		return [field, { canBeNull, canBeBlank }];
 	}),
-);
+) as typeof SCHOOL_FIELD_CHARACTERISTICS;
 
-deepStrictEqual(actualFieldCharacteristics, SCHOOL_FIELD_TYPES);
+const 필드_불일치 = EN_SCHOOL_FIELDS.flatMap((field) => {
+	const actual = actualFieldCharacteristics[field];
+	const expected = SCHOOL_FIELD_CHARACTERISTICS[field];
+	if (
+		actual.canBeNull === expected.canBeNull && //
+		actual.canBeBlank === expected.canBeBlank
+	) {
+		return [];
+	}
+	return { field, actual, expected };
+});
+
+if (필드_불일치.length > 0) {
+	issueSections.push('## 필드 특성 불일치', jsonToCodeblock(필드_불일치));
+}
 
 const result = safeParse(array(pipe(RawSchoolSchema, SchoolSchema)), rawSchools);
 
 if (!result.success) {
 	writeFileSync(
-		join(import.meta.dirname, `crawled-${timestamp}.issues.json`),
+		join(import.meta.dirname, `crawled-${now.getTime()}.issues.json`),
 		JSON.stringify(result.issues, null, '\t') + '\n',
 	);
+
+	issueSections.push('## 스키마 파싱 실패', jsonToCodeblock(result.issues));
+
+	await createIssue(
+		issueTitle,
+		issueSections,
+		join(import.meta.dirname, `crawled-${now.getTime()}.issues.md`),
+	);
+
 	exit(1);
 }
 
 writeFileSync(
-	join(import.meta.dirname, `crawled-${timestamp}.parsed.json`),
+	join(import.meta.dirname, `crawled-${now.getTime()}.parsed.json`),
 	JSON.stringify(result.output, null, '\t') + '\n',
 );
-
-const issueSections: string[] = [];
 
 type 시도_Header = (typeof 시도_Headers)[number];
 const 시도_Headers = [
@@ -132,30 +155,9 @@ if (시도_불일치.length > 0) {
 }
 
 if (issueSections.length) {
-	const title = `데이터 불일치 발견 (${new Date().toISOString().slice(0, 10)})`;
-	const body = (await format('issue.md', issueSections.join('\n\n'))).code;
-
-	if (env['GITHUB_ACTIONS'] !== 'true') {
-		writeFileSync(
-			join(import.meta.dirname, `crawled-${timestamp}.issues.md`),
-			`# ${title}\n\n${body}`,
-		);
-	} else {
-		const response = await fetch(
-			`https://api.github.com/repos/${env['GITHUB_REPOSITORY']}/issues`,
-			{
-				method: 'POST',
-				headers: {
-					'Authorization': `Bearer ${env['GITHUB_TOKEN']}`,
-					'Accept': 'application/vnd.github+json',
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify({ title, body }),
-			},
-		);
-		if (!response.ok) {
-			console.error(await response.text());
-			throw new Error(`${response.status} ${response.statusText}`);
-		}
-	}
+	await createIssue(
+		issueTitle,
+		issueSections,
+		join(import.meta.dirname, `crawled-${now.getTime()}.issues.md`),
+	);
 }
