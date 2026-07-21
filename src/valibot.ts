@@ -101,9 +101,10 @@ const 학교종류명 = [
 	'재외한국학교(고)',
 ] as const;
 
-const 설립명 = ['공립', '사립', '국립', '기타', '국외'] as const;
-const 남녀공학구분명 = ['남여공학', '남', '여'] as const;
 const 고등학교구분명 = ['일반고', '특성화고', '자율고', '특목고'] as const;
+const 고등학교일반전문구분명 = ['해당없음', '일반계', '전문계'] as const;
+const 남녀공학구분명 = ['남여공학', '남', '여'] as const;
+const 설립명 = ['공립', '사립', '국립', '기타', '국외'] as const;
 const 입시전후기구분명 = ['전기', '후기', '전후기'] as const;
 const 주야구분명 = ['주간', '야간', '주야간'] as const;
 
@@ -127,7 +128,7 @@ export const SchoolSchema = object({
 	팩스번호: nullable(TrimStringAndIsNonEmpty),
 	고등학교구분명: nullable(pipe(TrimStringAndIsNonEmpty, picklist(고등학교구분명))),
 	산업체특별학급존재여부: picklist(['N', 'Y']),
-	고등학교일반전문구분명: nullable(TrimStringAndIsNonEmpty),
+	고등학교일반전문구분명: nullable(pipe(TrimStringAndIsNonEmpty, picklist(고등학교일반전문구분명))),
 	특수목적고등학교계열명: nullable(TrimStringAndIsNonEmpty),
 	입시전후기구분명: pipe(TrimStringAndIsNonEmpty, picklist(입시전후기구분명)),
 	주야구분명: pipe(TrimStringAndIsNonEmpty, picklist(주야구분명)),
