@@ -23,7 +23,11 @@ export const createIssue = async (title: string, content: string | string[], pat
 			'Accept': 'application/vnd.github+json',
 			'Content-Type': 'application/json',
 		},
-		body: JSON.stringify({ title, body }),
+		body: JSON.stringify({
+			title,
+			body,
+			assignees: [env['GITHUB_REPOSITORY_OWNER']],
+		}),
 	});
 
 	if (!response.ok) {
