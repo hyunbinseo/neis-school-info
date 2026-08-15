@@ -12,15 +12,15 @@ jobs:
   crawl:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
-      - uses: pnpm/setup@v1
-        with:
-          runtime: node@lts
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: pnpm/setup@84cb39b217b10273981911c288cd62326dc7c6d2 # v2.0.2
+
       - run: node cli/scripts/crawl.ts
         env:
           GITHUB_TOKEN: ${{ github.token }}
           NEIS_API_KEY: ${{ secrets.NEIS_API_KEY }}
-      - uses: actions/upload-artifact@v7
+
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: crawled-${{ github.run_id }}
           path: cli/scripts/crawled-*.json
