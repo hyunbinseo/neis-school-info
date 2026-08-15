@@ -70,14 +70,14 @@ writeFileSync(
 const actualFieldCharacteristics = Object.fromEntries(
 	EN_SCHOOL_FIELDS.map((field) => {
 		let canBeNull = false;
-		let canBeBlank = false;
+		let canBeEmpty = false;
 		rawSchools.some((school) => {
 			const value = school[field];
 			if (value === null) canBeNull = true;
-			if (typeof value === 'string' && value.trim() === '') canBeBlank = true;
-			return canBeNull && canBeBlank;
+			if (typeof value === 'string' && value.trim() === '') canBeEmpty = true;
+			return canBeNull && canBeEmpty;
 		});
-		return [field, { canBeNull, canBeBlank }];
+		return [field, { canBeNull, canBeEmpty }];
 	}),
 ) as FieldCharacteristics;
 
@@ -87,7 +87,7 @@ const 필드_불일치 = EN_SCHOOL_FIELDS.flatMap((field) => {
 	const actual = actualFieldCharacteristics[field];
 	if (
 		actual.canBeNull === expected.canBeNull && //
-		actual.canBeBlank === expected.canBeBlank
+		actual.canBeEmpty === expected.canBeEmpty
 	) {
 		return [];
 	}
