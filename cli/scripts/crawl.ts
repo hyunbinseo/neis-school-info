@@ -17,7 +17,7 @@ import { OFFICE_CODE_TO_NAMES } from '#cli/enum.ts';
 import { createIssue, jsonToCodeblock } from '#cli/lib/github-issue.ts';
 import { EN_SCHOOL_FIELDS, type EnSchoolField } from '#src/enums.ts';
 import { HeadSchema, RawSchoolSchema, SchoolSchema } from '#src/valibot.ts';
-import { SCHOOL_FIELD_CHARACTERISTICS } from './crawl.valibot.ts';
+import { EXPECTED_FIELD_CHARACTERISTICS, type FieldCharacteristics } from './crawl.valibot.ts';
 
 const PAGE_SIZE = 1000;
 
@@ -79,11 +79,12 @@ const actualFieldCharacteristics = Object.fromEntries(
 		});
 		return [field, { canBeNull, canBeBlank }];
 	}),
-) as typeof SCHOOL_FIELD_CHARACTERISTICS;
+) as FieldCharacteristics;
 
 const 필드_불일치 = EN_SCHOOL_FIELDS.flatMap((field) => {
+	const expected = EXPECTED_FIELD_CHARACTERISTICS[field];
+	if (!expected) return [];
 	const actual = actualFieldCharacteristics[field];
-	const expected = SCHOOL_FIELD_CHARACTERISTICS[field];
 	if (
 		actual.canBeNull === expected.canBeNull && //
 		actual.canBeBlank === expected.canBeBlank

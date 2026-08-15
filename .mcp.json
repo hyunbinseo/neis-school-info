@@ -1,0 +1,8 @@
+{
+	"mcpServers": {
+		"valibot": {
+			"type": "http",
+			"url": "https://valibot.dev/mcp"
+		}
+	}
+}

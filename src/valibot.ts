@@ -1,10 +1,13 @@
 import {
+	check,
 	digits,
 	entriesFromList,
 	fallback,
 	type InferOutput,
 	isoDate,
 	length,
+	maxLength,
+	minLength,
 	nonEmpty,
 	nullable,
 	number,
@@ -17,6 +20,7 @@ import {
 	trim,
 	tuple,
 	unknown,
+	url,
 } from 'valibot';
 import {
 	FAILURE_CODES,
@@ -56,15 +60,44 @@ export const RawSchoolSchema = pipe(
 	),
 );
 
-const TrimStringAndIsNonEmpty = pipe(string(), trim(), nonEmpty());
+const TrimmedNonEmptyStringSchema = pipe(string(), trim(), nonEmpty());
 
-const TrimStringAndEmptyToNull = pipe(
+const TrimmedStringEmptyToNullSchema = pipe(
 	string(),
 	trim(),
 	transform((v) => v || null),
 );
 
-const YYYYMMDDToISODate = pipe(
+// NOTE `nullable` is needed to assign `null` as the `fallback()` value
+const PhoneNumberSchema = fallback(
+	nullable(
+		pipe(
+			TrimmedNonEmptyStringSchema,
+			transform((v) => v.replaceAll(/[() .+-]/g, '')), // e.g. 054--475-5386, +82-2-1234-5678
+			digits(),
+			minLength(8), // e.g. 15995789; intentionally drops 032114, etc.
+			maxLength(15), // E.164 max
+		),
+	),
+	null,
+);
+
+const URLSchema = fallback(
+	nullable(
+		pipe(
+			TrimmedNonEmptyStringSchema, // e.g. leading BOM in '﻿﻿http://school.cbe.go.kr/gagok-e/'
+			transform((v) => v.replaceAll(' ', '')), // e.g. 'http://ya-seochang. jge.es.kr'
+			// NOTE A public domain has a dot (name.tld); rare exceptions can be ignored
+			check((v) => v.includes('.')), // e.g. '강원도 정선군 여량면 여량7길 42' is not a URL
+			transform((v) => (/^https?:\/\//i.test(v) ? v : `https://${v}`)),
+			minLength(11), // e.g. http://x.io; the shortest technically valid URL
+			url(),
+		),
+	),
+	null,
+);
+
+const YYYYMMDDToISODateSchema = pipe(
 	string(),
 	trim(),
 	digits(),
@@ -111,28 +144,30 @@ const 주야구분명 = ['주간', '야간', '주야간'] as const;
 export type School = InferOutput<typeof SchoolSchema>;
 export const SchoolSchema = object({
 	시도교육청코드: picklist(OFFICE_CODES),
-	시도교육청명: TrimStringAndIsNonEmpty,
-	행정표준코드: TrimStringAndEmptyToNull,
-	학교명: TrimStringAndIsNonEmpty,
-	영문학교명: nullable(TrimStringAndEmptyToNull),
-	학교종류명: nullable(pipe(TrimStringAndIsNonEmpty, picklist(학교종류명))),
-	시도명: TrimStringAndIsNonEmpty,
-	관할조직명: TrimStringAndIsNonEmpty,
-	설립명: nullable(pipe(TrimStringAndIsNonEmpty, picklist(설립명))),
+	시도교육청명: TrimmedNonEmptyStringSchema,
+	행정표준코드: TrimmedStringEmptyToNullSchema,
+	학교명: TrimmedNonEmptyStringSchema,
+	영문학교명: nullable(TrimmedStringEmptyToNullSchema),
+	학교종류명: nullable(pipe(TrimmedNonEmptyStringSchema, picklist(학교종류명))),
+	시도명: TrimmedNonEmptyStringSchema,
+	관할조직명: TrimmedNonEmptyStringSchema,
+	설립명: nullable(pipe(TrimmedNonEmptyStringSchema, picklist(설립명))),
 	도로명우편번호: fallback(nullable(pipe(string(), trim(), digits(), length(5))), null),
-	도로명주소: nullable(TrimStringAndIsNonEmpty),
-	도로명상세주소: nullable(TrimStringAndEmptyToNull),
-	전화번호: TrimStringAndIsNonEmpty,
-	홈페이지주소: nullable(TrimStringAndIsNonEmpty),
-	남녀공학구분명: pipe(TrimStringAndIsNonEmpty, picklist(남녀공학구분명)),
-	팩스번호: nullable(TrimStringAndIsNonEmpty),
-	고등학교구분명: nullable(pipe(TrimStringAndIsNonEmpty, picklist(고등학교구분명))),
+	도로명주소: nullable(TrimmedNonEmptyStringSchema),
+	도로명상세주소: nullable(TrimmedStringEmptyToNullSchema),
+	전화번호: PhoneNumberSchema,
+	홈페이지주소: URLSchema,
+	남녀공학구분명: pipe(TrimmedNonEmptyStringSchema, picklist(남녀공학구분명)),
+	팩스번호: PhoneNumberSchema,
+	고등학교구분명: nullable(pipe(TrimmedNonEmptyStringSchema, picklist(고등학교구분명))),
 	산업체특별학급존재여부: picklist(['N', 'Y']),
-	고등학교일반전문구분명: nullable(pipe(TrimStringAndIsNonEmpty, picklist(고등학교일반전문구분명))),
-	특수목적고등학교계열명: nullable(TrimStringAndIsNonEmpty),
-	입시전후기구분명: pipe(TrimStringAndIsNonEmpty, picklist(입시전후기구분명)),
-	주야구분명: pipe(TrimStringAndIsNonEmpty, picklist(주야구분명)),
-	설립일자: YYYYMMDDToISODate,
-	개교기념일: YYYYMMDDToISODate,
-	수정일자: YYYYMMDDToISODate,
+	고등학교일반전문구분명: nullable(
+		pipe(TrimmedNonEmptyStringSchema, picklist(고등학교일반전문구분명)),
+	),
+	특수목적고등학교계열명: nullable(TrimmedNonEmptyStringSchema),
+	입시전후기구분명: pipe(TrimmedNonEmptyStringSchema, picklist(입시전후기구분명)),
+	주야구분명: pipe(TrimmedNonEmptyStringSchema, picklist(주야구분명)),
+	설립일자: YYYYMMDDToISODateSchema,
+	개교기념일: YYYYMMDDToISODateSchema,
+	수정일자: YYYYMMDDToISODateSchema,
 });
