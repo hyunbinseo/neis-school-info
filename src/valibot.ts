@@ -82,6 +82,7 @@ const PhoneNumberSchema = fallback(
 			digits(),
 			minLength(8), // e.g. 15995789; intentionally drops 032114, etc.
 			maxLength(15), // E.164 max
+			check((v) => !/^(\d)\1+$/.test(v)), // e.g. 000-0000-0000
 		),
 	),
 	null,
