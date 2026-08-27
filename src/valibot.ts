@@ -62,6 +62,7 @@ export const RawSchoolSchema = pipe(
 
 const NormalizeStringSchema = pipe(
 	string(),
+	// oxlint-disable-next-line no-irregular-whitespace
 	transform((v: string) => v.replaceAll(/\s+/g, ' ')), // e.g. NBSP in 'Kangnam Elementary School'
 	trim(),
 );
@@ -91,6 +92,7 @@ const PhoneNumberSchema = fallback(
 const URLSchema = fallback(
 	nullable(
 		pipe(
+			// oxlint-disable-next-line no-irregular-whitespace
 			NonEmptyStringSchema, // e.g. leading BOM in '﻿﻿http://school.cbe.go.kr/gagok-e/'
 			transform((v) => v.replaceAll(' ', '')), // e.g. 'http://ya-seochang. jge.es.kr'
 			// NOTE A public domain has a dot (name.tld); rare exceptions can be ignored

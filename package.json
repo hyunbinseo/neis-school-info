@@ -38,22 +38,22 @@
 		"@arethetypeswrong/core": "^0.18.5",
 		"@types/node": "^24.13.3",
 		"markdown-table": "^3.0.4",
-		"oxfmt": "^0.63.0",
-		"oxlint": "^1.78.0",
+		"oxfmt": "^0.65.0",
+		"oxlint": "^1.80.0",
 		"oxlint-tsgolint": "^7.0.2001",
-		"publint": "^0.3.23",
+		"publint": "^0.3.24",
 		"tsdown": "^0.22.14",
 		"typescript": "^7.0.2"
 	},
 	"devEngines": {
 		"packageManager": {
 			"name": "pnpm",
-			"version": "11.21.0",
+			"version": "12.0.0",
 			"onFail": "download"
 		},
 		"runtime": {
 			"name": "node",
-			"version": "24.19.0",
+			"version": "24.20.0",
 			"onFail": "download"
 		}
 	}
