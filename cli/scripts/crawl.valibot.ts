@@ -1,5 +1,9 @@
 import { is } from 'valibot';
-import { EN_SCHOOL_FIELDS, SCHOOL_FIELD_EN_TO_KO, type EnSchoolField } from '#src/enums.ts';
+import {
+	EN_SCHOOL_FIELDS,
+	SCHOOL_FIELD_EN_TO_KO,
+	type EnSchoolField,
+} from '#src/enums/school-field.ts';
 import { SchoolSchema } from '#src/valibot.ts';
 
 type FieldCharacteristic = Record<'canBeNull' | 'canBeEmpty', boolean>;

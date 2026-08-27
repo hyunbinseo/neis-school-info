@@ -22,14 +22,13 @@ import {
 	unknown,
 	url,
 } from 'valibot';
+import { OFFICE_CODES } from './enums/office-code.ts';
+import { FAILURE_CODES, SUCCESS_CODES } from './enums/result-code.ts';
 import {
-	FAILURE_CODES,
-	type EnSchoolField,
-	OFFICE_CODES,
-	SCHOOL_FIELD_EN_TO_KO,
 	EN_SCHOOL_FIELDS,
-	SUCCESS_CODES,
-} from './enums.ts';
+	SCHOOL_FIELD_EN_TO_KO,
+	type EnSchoolField,
+} from './enums/school-field.ts';
 
 export const NoRowsSchema = strictObject({
 	RESULT: object({

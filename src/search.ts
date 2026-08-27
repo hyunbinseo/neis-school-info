@@ -1,5 +1,6 @@
 import { array, object, parse, pick, pipe, safeParse, strictObject, tuple } from 'valibot';
-import { FILTER_KEY_TO_SEARCH, FILTER_KEYS, type FailureCode, type SuccessCode } from './enums.ts';
+import { FILTER_KEY_TO_SEARCH, FILTER_KEYS } from './enums/filter-key.ts';
+import type { FailureCode, SuccessCode } from './enums/result-code.ts';
 import type { Filters, SchoolFields } from './params.ts';
 import { HeadSchema, NoRowsSchema, RawSchoolSchema, SchoolSchema, type School } from './valibot.ts';
 

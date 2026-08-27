@@ -1,9 +1,7 @@
-import type { OfficeCode } from '#src/enums.ts';
+export type 시도명 = (typeof OFFICE_CODE_TO_NAMES)[시도교육청코드][0];
+export type 시도교육청명 = (typeof OFFICE_CODE_TO_NAMES)[시도교육청코드][1];
 
-export const OFFICE_CODE_TO_NAMES: Record<
-	OfficeCode,
-	readonly [시도명: string, 시도교육청명: string]
-> = {
+export const OFFICE_CODE_TO_NAMES = {
 	B10: ['서울특별시', '서울특별시교육청'],
 	C10: ['부산광역시', '부산광역시교육청'],
 	D10: ['대구광역시', '대구광역시교육청'],
@@ -22,4 +20,26 @@ export const OFFICE_CODE_TO_NAMES: Record<
 	S10: ['경상남도', '경상남도교육청'],
 	T10: ['제주특별자치도', '제주특별자치도교육청'],
 	V10: ['재외한국학교', '재외한국학교교육청'],
-};
+} as const satisfies Record<시도교육청코드, readonly [string, string]>;
+
+export type 시도교육청코드 = (typeof OFFICE_CODES)[number];
+export const OFFICE_CODES = [
+	'B10',
+	'C10',
+	'D10',
+	'E10',
+	'F10',
+	'G10',
+	'H10',
+	'I10',
+	'J10',
+	'K10',
+	'M10',
+	'N10',
+	'P10',
+	'Q10',
+	'R10',
+	'S10',
+	'T10',
+	'V10',
+] as const;

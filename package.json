@@ -24,7 +24,7 @@
 	},
 	"scripts": {
 		"prepack": "tsdown",
-		"version": "tsdown && git add package.json",
+		"version": "node --run test && tsdown && git add package.json",
 		"test": "node --env-file=.env --test",
 		"fmt": "oxfmt",
 		"fmt:check": "oxfmt --check",

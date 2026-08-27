@@ -13,9 +13,9 @@ import {
 	tuple,
 	unknown,
 } from 'valibot';
-import { OFFICE_CODE_TO_NAMES } from '#cli/enum.ts';
 import { createIssue, jsonToCodeblock } from '#cli/lib/github-issue.ts';
-import { EN_SCHOOL_FIELDS, type EnSchoolField } from '#src/enums.ts';
+import { OFFICE_CODE_TO_NAMES } from '#src/enums/office-code.ts';
+import { EN_SCHOOL_FIELDS, type EnSchoolField } from '#src/enums/school-field.ts';
 import { HeadSchema, RawSchoolSchema, SchoolSchema } from '#src/valibot.ts';
 import { EXPECTED_FIELD_CHARACTERISTICS, type FieldCharacteristics } from './crawl.valibot.ts';
 
