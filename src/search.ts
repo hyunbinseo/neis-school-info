@@ -4,11 +4,12 @@ import type { FailureCode, SuccessCode } from './enums/result-code.ts';
 import type { Filters, SchoolFields } from './params.ts';
 import { HeadSchema, NoRowsSchema, RawSchoolSchema, SchoolSchema, type School } from './valibot.ts';
 
-// `S extends unknown` forces distribution over School's union, so Pick keeps
-// 행정표준코드 narrowed instead of collapsing it back to `string | null`.
-type PickedSchool<Fields extends SchoolFields, S extends School = School> = [Fields] extends [never]
+type PickedSchool<
+	Fields extends SchoolFields,
+	S extends School = School, // naked type parameter, so `Pick` distributes over the union
+> = [Fields] extends [never] // tuple wrapper checks `Fields` as a whole
 	? School
-	: S extends unknown
+	: S extends unknown // keeps 행정표준코드 narrowed instead of collapsing to `string | null`
 		? Pick<S, Fields[number]>
 		: never;
 

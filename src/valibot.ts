@@ -73,7 +73,7 @@ const StringEmptyToNullSchema = pipe(
 	transform((v) => v || null),
 );
 
-// NOTE `nullable` is needed to assign `null` as the `fallback()` value
+// `nullable` is needed to assign `null` as the `fallback()` value.
 const PhoneNumberSchema = fallback(
 	nullable(
 		pipe(
@@ -94,7 +94,7 @@ const URLSchema = fallback(
 			// oxlint-disable-next-line no-irregular-whitespace
 			NonEmptyStringSchema, // e.g. leading BOM in '﻿﻿http://school.cbe.go.kr/gagok-e/'
 			transform((v) => v.replaceAll(' ', '')), // e.g. 'http://ya-seochang. jge.es.kr'
-			// NOTE A public domain has a dot (name.tld); rare exceptions can be ignored
+			// A public domain has a dot (name.tld); rare exceptions can be ignored.
 			check((v) => v.includes('.')), // e.g. '강원도 정선군 여량면 여량7길 42' is not a URL
 			transform((v) => (/^https?:\/\//i.test(v) ? v : `https://${v}`)),
 			minLength(11), // e.g. http://x.io; the shortest technically valid URL
@@ -177,5 +177,5 @@ export const SchoolSchema = object({
 });
 
 export type School = Omit<InferOutput<typeof SchoolSchema>, '행정표준코드'> &
-	// NOTE Allow `Array#filter` to narrow this
+	// A union so `Array#filter` can narrow it.
 	({ 행정표준코드: string } | { 행정표준코드: null });
