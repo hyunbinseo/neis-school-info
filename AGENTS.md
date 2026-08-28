@@ -1,5 +1,7 @@
 ## Documentation
 
+Sync `README.md` with public API changes (exported functions, types, fields).
+
 - Prose sentences are capitalized and end with a period.
 - List items are capitalized and uniform per list: all sentence-style (period) or fragment-style (no period).
 - Acronyms and proper nouns keep their casing (e.g. `NBSP`, `BOM`; not `nbsp`, `bom`).

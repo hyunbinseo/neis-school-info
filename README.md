@@ -47,10 +47,13 @@ const result = await search(
 
 if (result.ok) {
 	result.schools
-		// 행정표준코드 타입이 string으로 좁혀짐
+		// 행정표준코드가 없는 학교를 제외할 수 있음
 		.filter((school) => school.행정표준코드 !== null);
 }
 ```
+
+> [!IMPORTANT]
+> 타입스크립트로 표현되지 않는 정규화 규칙은 [응답값](#응답값) 섹션을 참고한다 (예: 설립일자 등 날짜는 `YYYY-MM-DD` 형식).
 
 ### 검색 조건 (`filters`)
 
@@ -77,6 +80,46 @@ type Filters = Partial<{
 
 > [!CAUTION]
 > `시도명`은 바뀔 수 있으며, 완전 일치이므로 괄호까지도 맞춰야 한다 (예: `전라남도` → `전남광주통합특별시(광주)`). 예전 값을 쓰면 오류 없이 빈 배열만 돌아오므로, `시도교육청코드`를 쓰는 편이 낫다. [목록](./src/enums/office-code.ts)
+
+### 응답값
+
+이 라이브러리는 나이스 API 응답값을 검증하고 변환한다 (예: `도로명우편번호`는 공백을 제거한 후 5자리 숫자가 아니면 `null`로 변환함).
+
+```ts
+// result.schools[number]!
+type School = {
+	/* 열거형 - src/enums/school-value.ts */
+	고등학교구분명: 고등학교구분명 | null;
+	고등학교일반전문구분명: 고등학교일반전문구분명 | null;
+	남녀공학구분명: 남녀공학구분명;
+	설립명: 설립명 | null;
+	입시전후기구분명: 입시전후기구분명;
+	주야구분명: 주야구분명;
+	학교종류명: 학교종류명 | null;
+
+	/* 열거형 - src/enums/office-code.ts */
+	시도교육청코드: 시도교육청코드;
+
+	/* 그 외 */
+	개교기념일: string; // `YYYY-MM-DD`
+	관할조직명: string;
+	도로명상세주소: string | null;
+	도로명우편번호: string | null; // 5자리 숫자
+	도로명주소: string | null;
+	산업체특별학급존재여부: 'Y' | 'N';
+	설립일자: string; // `YYYY-MM-DD`
+	수정일자: string; // `YYYY-MM-DD`
+	시도교육청명: string;
+	시도명: string;
+	영문학교명: string | null;
+	전화번호: string | null; // 8~15자리 숫자
+	특수목적고등학교계열명: string | null;
+	팩스번호: string | null; // 8~15자리 숫자
+	학교명: string;
+	행정표준코드: string | null;
+	홈페이지주소: string | null; // `http(s)://…`
+};
+```
 
 ## 데이터 활용 시 유의사항
 
