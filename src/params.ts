@@ -6,7 +6,7 @@ export type SchoolFields = readonly [SchoolField, ...SchoolField[]];
 
 export type Filters = Partial<{
 	시도교육청코드: 시도교육청코드;
-	행정표준코드: string;
+	행정표준코드: string | null;
 	학교명: string;
 	학교종류명: string;
 	시도명: 시도명 | (string & {});

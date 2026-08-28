@@ -115,6 +115,16 @@ void test('행정표준코드가 없는 학교는 공백 7칸으로 검색', asy
 	assert.equal(school.행정표준코드, null);
 });
 
+void test('행정표준코드가 없는 학교는 null로도 검색 가능', async () => {
+	const [spaces, nullValue] = await Promise.all([
+		search({ pageSize: 1, filters: { 행정표준코드: ' '.repeat(7) } }, { apiKey }),
+		search({ pageSize: 1, filters: { 행정표준코드: null } }, { apiKey }),
+	]);
+	assert.equal(spaces.ok, true);
+	assert.equal(nullValue.ok, true);
+	assert.equal(spaces.totalCount, nullValue.totalCount);
+});
+
 void test('잘못된 API 키를 입력한 경우', async () => {
 	const result = await search({}, { apiKey: 'invalid' });
 	assert.equal(result.ok, false);

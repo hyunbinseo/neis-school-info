@@ -37,9 +37,10 @@ export const search = async <const Fields extends SchoolFields = never>(
 	url.searchParams.set('pSize', (params.pageSize ?? 100).toString());
 
 	for (const key of FILTER_KEYS) {
-		const value = params.filters?.[key];
-		if (!value) continue;
 		const searchKey = FILTER_KEY_TO_SEARCH[key];
+		let value = params.filters?.[key];
+		if (value === null && key === '행정표준코드') value = ' '.repeat(7);
+		if (!value) continue;
 		url.searchParams.set(searchKey, value);
 	}
 
