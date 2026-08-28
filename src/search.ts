@@ -4,18 +4,26 @@ import type { FailureCode, SuccessCode } from './enums/result-code.ts';
 import type { Filters, SchoolFields } from './params.ts';
 import { HeadSchema, NoRowsSchema, RawSchoolSchema, SchoolSchema, type School } from './valibot.ts';
 
-export type SuccessResult<Fields extends SchoolFields = never> = {
-	ok: true;
-	code: SuccessCode;
-	totalCount: number;
-	schools: Array<[Fields] extends [never] ? School : Pick<School, Fields[number]>>;
-};
+// `S extends unknown` forces distribution over School's union, so Pick keeps
+// 행정표준코드 narrowed instead of collapsing it back to `string | null`.
+type PickedSchool<Fields extends SchoolFields, S extends School = School> = [Fields] extends [never]
+	? School
+	: S extends unknown
+		? Pick<S, Fields[number]>
+		: never;
 
-export type FailureResult = {
-	ok: false;
-	code: FailureCode;
-	message: string;
-};
+export type SearchResult<Fields extends SchoolFields = never> =
+	| {
+			ok: true;
+			code: SuccessCode;
+			totalCount: number;
+			schools: PickedSchool<Fields>[];
+	  }
+	| {
+			ok: false;
+			code: FailureCode;
+			message: string;
+	  };
 
 export const search = async <const Fields extends SchoolFields = never>(
 	params: Partial<{
@@ -28,7 +36,7 @@ export const search = async <const Fields extends SchoolFields = never>(
 		apiKey: string;
 		fetch?: typeof fetch;
 	},
-): Promise<SuccessResult<Fields> | FailureResult> => {
+): Promise<SearchResult<Fields>> => {
 	const url = new URL('https://open.neis.go.kr/hub/schoolInfo');
 
 	url.searchParams.set('Type', 'json');
@@ -90,6 +98,6 @@ export const search = async <const Fields extends SchoolFields = never>(
 		ok: true,
 		code: RESULT.CODE,
 		totalCount,
-		schools,
-	} as SuccessResult<Fields>;
+		schools: schools as PickedSchool<Fields>[],
+	};
 };

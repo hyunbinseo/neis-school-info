@@ -46,7 +46,9 @@ const result = await search(
 );
 
 if (result.ok) {
-	// TODO
+	result.schools
+		// 행정표준코드 타입이 string으로 좁혀짐
+		.filter((school) => school.행정표준코드 !== null);
 }
 ```
 

@@ -4,7 +4,7 @@ import { test } from 'node:test';
 import { FILTER_KEYS } from './enums/filter-key.ts';
 import { OFFICE_CODE_TO_NAMES } from './enums/office-code.ts';
 import type { Filters } from './params.ts';
-import { search, type FailureResult, type SuccessResult } from './search.ts';
+import { search, type SearchResult } from './search.ts';
 
 const { NEIS_API_KEY: apiKey } = env;
 if (!apiKey) throw new Error();
@@ -53,10 +53,8 @@ void test('시도명은 부분 일치 미지원', async () => {
 void test('시도명, 시도교육청명은 API 반환값 그대로 사용', async () => {
 	// 일부 시도명·시도교육청명에는 괄호 표기가 붙는다. (예: 전남광주통합특별시(광주))
 	for (const [시도명, 시도교육청명] of Object.values(OFFICE_CODE_TO_NAMES)) {
-		const result: SuccessResult | FailureResult = await search(
-			{ pageSize: 5, filters: { 시도명 } },
-			{ apiKey },
-		);
+		// The annotation works around a TS bug: unannotated, this resolves to `any` (TS7022).
+		const result: SearchResult = await search({ pageSize: 5, filters: { 시도명 } }, { apiKey });
 		assert.equal(result.ok, true);
 		assert.equal(result.code, 'INFO-000');
 		assert.ok(result.totalCount > 0);
@@ -123,6 +121,28 @@ void test('행정표준코드가 없는 학교는 null로도 검색 가능', asy
 	assert.equal(spaces.ok, true);
 	assert.equal(nullValue.ok, true);
 	assert.equal(spaces.totalCount, nullValue.totalCount);
+});
+
+void test('행정표준코드로 필터링하면 타입이 string으로 좁혀짐', async () => {
+	const result = await search({}, { apiKey });
+	assert.equal(result.ok, true);
+
+	const code: string | undefined = result.schools
+		.filter((s) => s.행정표준코드 !== null)
+		.at(0)?.행정표준코드;
+
+	void code;
+});
+
+void test('fields로 필드를 지정해도 행정표준코드 필터링 시 타입이 string으로 좁혀짐', async () => {
+	const result = await search({ fields: ['행정표준코드'] }, { apiKey });
+	assert.equal(result.ok, true);
+
+	const code: string | undefined = result.schools
+		.filter((s) => s.행정표준코드 !== null)
+		.at(0)?.행정표준코드;
+
+	void code;
 });
 
 void test('잘못된 API 키를 입력한 경우', async () => {

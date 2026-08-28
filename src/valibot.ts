@@ -148,7 +148,6 @@ const 설립명 = ['공립', '사립', '국립', '기타', '국외'] as const;
 const 입시전후기구분명 = ['전기', '후기', '전후기'] as const;
 const 주야구분명 = ['주간', '야간', '주야간'] as const;
 
-export type School = InferOutput<typeof SchoolSchema>;
 export const SchoolSchema = object({
 	시도교육청코드: picklist(OFFICE_CODES),
 	시도교육청명: NonEmptyStringSchema,
@@ -176,3 +175,7 @@ export const SchoolSchema = object({
 	개교기념일: YYYYMMDDToISODateSchema,
 	수정일자: YYYYMMDDToISODateSchema,
 });
+
+export type School = Omit<InferOutput<typeof SchoolSchema>, '행정표준코드'> &
+	// NOTE Allow `Array#filter` to narrow this
+	({ 행정표준코드: string } | { 행정표준코드: null });
