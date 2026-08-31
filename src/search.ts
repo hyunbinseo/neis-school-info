@@ -17,7 +17,11 @@ export type SearchResult<Fields extends SchoolFields = never> =
 	| {
 			ok: true;
 			code: SuccessCode;
-			totalCount: number;
+			meta: {
+				pageIndex: number;
+				pageSize: number;
+				totalCount: number;
+			};
 			schools: PickedSchool<Fields>[];
 	  }
 	| {
@@ -38,12 +42,15 @@ export const search = async <const Fields extends SchoolFields = never>(
 		fetch?: typeof fetch;
 	},
 ): Promise<SearchResult<Fields>> => {
+	const pageIndex = params.pageIndex ?? 0;
+	const pageSize = params.pageSize ?? 100;
+
 	const url = new URL('https://open.neis.go.kr/hub/schoolInfo');
 
 	url.searchParams.set('Type', 'json');
 	url.searchParams.set('KEY', opts.apiKey);
-	url.searchParams.set('pIndex', ((params.pageIndex ?? 0) + 1).toString()); // 1부터 시작
-	url.searchParams.set('pSize', (params.pageSize ?? 100).toString());
+	url.searchParams.set('pIndex', (pageIndex + 1).toString()); // 1부터 시작
+	url.searchParams.set('pSize', pageSize.toString());
 
 	for (const key of FILTER_KEYS) {
 		const searchKey = FILTER_KEY_TO_SEARCH[key];
@@ -62,7 +69,12 @@ export const search = async <const Fields extends SchoolFields = never>(
 	if (noRows.success) {
 		const { RESULT } = noRows.output;
 		return RESULT.CODE === 'INFO-000' || RESULT.CODE === 'INFO-200'
-			? { ok: true, code: RESULT.CODE, totalCount: 0, schools: [] }
+			? {
+					ok: true,
+					code: RESULT.CODE,
+					meta: { pageIndex, pageSize, totalCount: 0 },
+					schools: [],
+				}
 			: { ok: false, code: RESULT.CODE, message: RESULT.MESSAGE };
 	}
 
@@ -98,7 +110,11 @@ export const search = async <const Fields extends SchoolFields = never>(
 	return {
 		ok: true,
 		code: RESULT.CODE,
-		totalCount,
+		meta: {
+			pageIndex,
+			pageSize,
+			totalCount,
+		},
 		schools: schools as PickedSchool<Fields>[],
 	};
 };

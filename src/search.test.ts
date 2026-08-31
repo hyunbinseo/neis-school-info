@@ -13,7 +13,7 @@ void test('기본 검색', async () => {
 	const result = await search({ filters: { 학교명: '가락고등학교' } }, { apiKey });
 	assert.equal(result.ok, true);
 	assert.equal(result.code, 'INFO-000');
-	assert.ok(result.totalCount > 0);
+	assert.ok(result.meta.totalCount > 0);
 
 	const school = result.schools.at(0);
 	assert.ok(school);
@@ -37,17 +37,27 @@ void test('검색 시 지정한 필드만 반환', async () => {
 
 void test('검색 결과가 없는 경우', async () => {
 	const result = await search({ filters: { 학교명: 'invalid' } }, { apiKey });
-	assert.deepEqual(result, { ok: true, code: 'INFO-200', totalCount: 0, schools: [] });
+	assert.deepEqual(result, {
+		ok: true,
+		code: 'INFO-200',
+		meta: { pageIndex: 0, pageSize: 100, totalCount: 0 },
+		schools: [],
+	});
 });
 
 void test('시도명은 부분 일치 미지원', async () => {
 	const partial = await search({ filters: { 시도명: '경기' } }, { apiKey });
-	assert.deepEqual(partial, { ok: true, code: 'INFO-200', totalCount: 0, schools: [] });
+	assert.deepEqual(partial, {
+		ok: true,
+		code: 'INFO-200',
+		meta: { pageIndex: 0, pageSize: 100, totalCount: 0 },
+		schools: [],
+	});
 
 	const exact = await search({ filters: { 시도명: '경기도' } }, { apiKey });
 	assert.equal(exact.ok, true);
 	assert.equal(exact.code, 'INFO-000');
-	assert.ok(exact.totalCount > 0);
+	assert.ok(exact.meta.totalCount > 0);
 });
 
 void test('시도명, 시도교육청명은 API 반환값 그대로 사용', async () => {
@@ -57,7 +67,7 @@ void test('시도명, 시도교육청명은 API 반환값 그대로 사용', asy
 		const result: SearchResult = await search({ pageSize: 5, filters: { 시도명 } }, { apiKey });
 		assert.equal(result.ok, true);
 		assert.equal(result.code, 'INFO-000');
-		assert.ok(result.totalCount > 0);
+		assert.ok(result.meta.totalCount > 0);
 		for (const school of result.schools) {
 			assert.equal(school.시도명, 시도명);
 			assert.equal(school.시도교육청명, 시도교육청명);
@@ -67,22 +77,32 @@ void test('시도명, 시도교육청명은 API 반환값 그대로 사용', asy
 
 void test('학교종류명은 부분 일치 미지원', async () => {
 	const partial = await search({ filters: { 학교종류명: '고등' } }, { apiKey });
-	assert.deepEqual(partial, { ok: true, code: 'INFO-200', totalCount: 0, schools: [] });
+	assert.deepEqual(partial, {
+		ok: true,
+		code: 'INFO-200',
+		meta: { pageIndex: 0, pageSize: 100, totalCount: 0 },
+		schools: [],
+	});
 
 	const exact = await search({ filters: { 학교종류명: '고등학교' } }, { apiKey });
 	assert.equal(exact.ok, true);
 	assert.equal(exact.code, 'INFO-000');
-	assert.ok(exact.totalCount > 0);
+	assert.ok(exact.meta.totalCount > 0);
 });
 
 void test('설립명은 부분 일치 미지원', async () => {
 	const partial = await search({ filters: { 설립명: '공' } }, { apiKey });
-	assert.deepEqual(partial, { ok: true, code: 'INFO-200', totalCount: 0, schools: [] });
+	assert.deepEqual(partial, {
+		ok: true,
+		code: 'INFO-200',
+		meta: { pageIndex: 0, pageSize: 100, totalCount: 0 },
+		schools: [],
+	});
 
 	const exact = await search({ filters: { 설립명: '공립' } }, { apiKey });
 	assert.equal(exact.ok, true);
 	assert.equal(exact.code, 'INFO-000');
-	assert.ok(exact.totalCount > 0);
+	assert.ok(exact.meta.totalCount > 0);
 });
 
 void test('빈 문자열 필터는 제외됨', async () => {
@@ -95,7 +115,7 @@ void test('빈 문자열 필터는 제외됨', async () => {
 	assert.equal(all.ok, true);
 	for (const result of filtered) {
 		assert.equal(result.ok, true);
-		assert.equal(result.totalCount, all.totalCount);
+		assert.equal(result.meta.totalCount, all.meta.totalCount);
 	}
 });
 
@@ -106,7 +126,7 @@ void test('행정표준코드가 없는 학교는 공백 7칸으로 검색', asy
 	);
 	assert.equal(result.ok, true);
 	assert.equal(result.code, 'INFO-000');
-	assert.ok(result.totalCount > 0);
+	assert.ok(result.meta.totalCount > 0);
 
 	const school = result.schools.at(0);
 	assert.ok(school);
@@ -120,7 +140,7 @@ void test('행정표준코드가 없는 학교는 null로도 검색 가능', asy
 	]);
 	assert.equal(spaces.ok, true);
 	assert.equal(nullValue.ok, true);
-	assert.equal(spaces.totalCount, nullValue.totalCount);
+	assert.equal(spaces.meta.totalCount, nullValue.meta.totalCount);
 });
 
 void test('행정표준코드로 필터링하면 타입이 string으로 좁혀짐', async () => {

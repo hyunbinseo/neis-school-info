@@ -86,6 +86,28 @@ type Filters = Partial<{
 이 라이브러리는 나이스 API 응답값을 검증하고 변환한다 (예: `도로명우편번호`는 공백을 제거한 후 5자리 숫자가 아니면 `null`로 변환함).
 
 ```ts
+result = {
+	ok: true,
+	code: 'INFO-000',
+	meta: {
+		pageIndex: 0,
+		pageSize: 100,
+		totalCount: 12345,
+	},
+	schools: [
+		{
+			시도교육청코드: 'OO',
+			시도교육청명: 'OO특별시교육청',
+			행정표준코드: '0000000',
+			학교명: 'OO고등학교',
+			영문학교명: 'OO High School',
+			// …
+		},
+	],
+};
+```
+
+```ts
 // result.schools[number]!
 type School = {
 	/* 열거형 - src/enums/school-value.ts */
