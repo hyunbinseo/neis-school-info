@@ -1,5 +1,8 @@
 export type SuccessCode = (typeof SUCCESS_CODES)[number];
-export const SUCCESS_CODES = ['INFO-000', 'INFO-200'] as const;
+export const SUCCESS_CODES = [
+	'INFO-000', // 정상 처리되었습니다.
+	'INFO-200', // 해당하는 데이터가 없습니다.
+] as const;
 
 export type FailureCode = (typeof FAILURE_CODES)[number];
 export const FAILURE_CODES = [

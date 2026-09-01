@@ -1,4 +1,4 @@
-import { array, object, parse, pick, pipe, safeParse, strictObject, tuple } from 'valibot';
+import { array, object, pick, pipe, safeParse, strictObject, tuple } from 'valibot';
 import { FILTER_KEY_TO_SEARCH, FILTER_KEYS } from './enums/filter-key.ts';
 import type { FailureCode, SuccessCode } from './enums/result-code.ts';
 import type { Filters, SchoolFields } from './params.ts';
@@ -28,6 +28,10 @@ export type SearchResult<Fields extends SchoolFields = never> =
 			ok: false;
 			code: FailureCode;
 			message: string;
+	  }
+	| {
+			ok: false;
+			code: null;
 	  };
 
 export const search = async <const Fields extends SchoolFields = never>(
@@ -65,9 +69,9 @@ export const search = async <const Fields extends SchoolFields = never>(
 
 	const raw = await response.json();
 
-	const noRows = safeParse(NoRowsSchema, raw);
-	if (noRows.success) {
-		const { RESULT } = noRows.output;
+	const noRowsResult = safeParse(NoRowsSchema, raw);
+	if (noRowsResult.success) {
+		const { RESULT } = noRowsResult.output;
 		return RESULT.CODE === 'INFO-000' || RESULT.CODE === 'INFO-200'
 			? {
 					ok: true,
@@ -78,17 +82,7 @@ export const search = async <const Fields extends SchoolFields = never>(
 			: { ok: false, code: RESULT.CODE, message: RESULT.MESSAGE };
 	}
 
-	const {
-		schoolInfo: [
-			{
-				head: [
-					{ list_total_count: totalCount }, //
-					{ RESULT },
-				],
-			},
-			{ row: schools },
-		],
-	} = parse(
+	const result = safeParse(
 		strictObject({
 			schoolInfo: tuple([
 				object({ head: HeadSchema }),
@@ -106,6 +100,20 @@ export const search = async <const Fields extends SchoolFields = never>(
 		}),
 		raw,
 	);
+
+	if (!result.success) return { ok: false, code: null };
+
+	const {
+		schoolInfo: [
+			{
+				head: [
+					{ list_total_count: totalCount }, //
+					{ RESULT },
+				],
+			},
+			{ row: schools },
+		],
+	} = result.output;
 
 	return {
 		ok: true,

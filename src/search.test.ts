@@ -170,3 +170,9 @@ void test('잘못된 API 키를 입력한 경우', async () => {
 	assert.equal(result.ok, false);
 	assert.equal(result.code, 'ERROR-290');
 });
+
+void test('알 수 없는 응답은 code가 null로 반환됨', async () => {
+	const fetch = async () => new Response(JSON.stringify({}));
+	const result = await search({}, { apiKey, fetch });
+	assert.deepEqual(result, { ok: false, code: null });
+});
