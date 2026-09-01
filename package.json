@@ -6,6 +6,8 @@
 	"bugs": {
 		"url": "https://github.com/hyunbinseo/neis-school-info/issues"
 	},
+	"license": "MIT",
+	"author": "Hyunbin Seo",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/hyunbinseo/neis-school-info.git"
@@ -14,6 +16,7 @@
 		"dist"
 	],
 	"type": "module",
+	"sideEffects": false,
 	"imports": {
 		"#cli/*": "./cli/*",
 		"#src/*": "./src/*"
