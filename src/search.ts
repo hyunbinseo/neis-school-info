@@ -1,4 +1,18 @@
-import { array, object, pick, pipe, safeParse, strictObject, tuple } from 'valibot';
+import {
+	array,
+	integer,
+	maxValue,
+	minValue,
+	number,
+	object,
+	optional,
+	parse,
+	pick,
+	pipe,
+	safeParse,
+	strictObject,
+	tuple,
+} from 'valibot';
 import { FILTER_KEY_TO_SEARCH, FILTER_KEYS } from './enums/filter-key.ts';
 import type { FailureCode, SuccessCode } from './enums/result-code.ts';
 import type { Filters, SchoolFields } from './params.ts';
@@ -46,14 +60,20 @@ export const search = async <const Fields extends SchoolFields = never>(
 		fetch?: typeof fetch;
 	},
 ): Promise<SearchResult<Fields>> => {
-	const pageIndex = params.pageIndex ?? 0;
-	const pageSize = params.pageSize ?? 100;
+	const { pageIndex, pageSize } = parse(
+		object({
+			pageIndex: optional(pipe(number(), integer(), minValue(0)), 0),
+			// ERROR-336 데이터 요청은 한 번에 최대 1,000건을 넘을 수 없습니다.
+			pageSize: optional(pipe(number(), integer(), minValue(1), maxValue(1000)), 100),
+		}),
+		params,
+	);
 
 	const url = new URL('https://open.neis.go.kr/hub/schoolInfo');
 
 	url.searchParams.set('Type', 'json');
 	url.searchParams.set('KEY', opts.apiKey);
-	url.searchParams.set('pIndex', (pageIndex + 1).toString()); // 1부터 시작
+	url.searchParams.set('pIndex', (pageIndex + 1).toString()); // pIndex는 1부터 시작
 	url.searchParams.set('pSize', pageSize.toString());
 
 	for (const key of FILTER_KEYS) {

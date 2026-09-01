@@ -176,3 +176,11 @@ void test('알 수 없는 응답은 code가 null로 반환됨', async () => {
 	const result = await search({}, { apiKey, fetch });
 	assert.deepEqual(result, { ok: false, code: null });
 });
+
+void test('잘못된 페이지 인자는 요청 전에 예외를 던짐', async () => {
+	const fetch = () => assert.fail('요청이 전송되면 안 됨');
+	await assert.rejects(search({ pageIndex: -1 }, { apiKey, fetch }));
+	await assert.rejects(search({ pageIndex: 1.5 }, { apiKey, fetch }));
+	await assert.rejects(search({ pageSize: 0 }, { apiKey, fetch }));
+	await assert.rejects(search({ pageSize: 1001 }, { apiKey, fetch }));
+});

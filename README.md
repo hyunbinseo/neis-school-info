@@ -41,8 +41,16 @@ pnpm i neis-school-info
 import { search } from 'neis-school-info';
 
 const result = await search(
-	{ filters: { 학교명: 'OO고등학교' } }, //
-	{ apiKey: 'NEIS_OPEN_API_KEY' },
+	{
+		fields: ['학교명', '행정표준코드'], // (선택) 지정된 필드만 검증 후 반환
+		filters: { 학교명: 'OO고등학교' }, // (선택) 검색 조건; 아래 참고
+		pageIndex: 0, // (선택) 기본값 0; pIndex = pageIndex + 1
+		pageSize: 100, // (선택) 기본값 100
+	},
+	{
+		apiKey: 'NEIS_OPEN_API_KEY',
+		fetch: customFetch, // (선택) 커스텀 fetch 전달
+	},
 );
 
 if (result.ok) {
