@@ -22,7 +22,8 @@ import {
 	unknown,
 	url,
 } from 'valibot';
-import { OFFICE_CODES } from './enums/office-code.ts';
+import { type YN, YN_VALUES } from './enums/misc.ts';
+import { OFFICE_CODES, type 시도교육청코드 } from './enums/office-code.ts';
 import { FAILURE_CODES, SUCCESS_CODES } from './enums/result-code.ts';
 import {
 	EN_SCHOOL_FIELDS,
@@ -140,7 +141,7 @@ export const SchoolSchema = object({
 	남녀공학구분명: pipe(NonEmptyStringSchema, picklist(남녀공학구분명)),
 	팩스번호: PhoneNumberSchema,
 	고등학교구분명: nullable(pipe(NonEmptyStringSchema, picklist(고등학교구분명))),
-	산업체특별학급존재여부: picklist(['N', 'Y']),
+	산업체특별학급존재여부: picklist(YN_VALUES),
 	고등학교일반전문구분명: nullable(pipe(NonEmptyStringSchema, picklist(고등학교일반전문구분명))),
 	특수목적고등학교계열명: nullable(NonEmptyStringSchema),
 	입시전후기구분명: pipe(NonEmptyStringSchema, picklist(입시전후기구분명)),
@@ -150,6 +151,44 @@ export const SchoolSchema = object({
 	수정일자: YYYYMMDDToISODateSchema,
 });
 
-export type School = Omit<InferOutput<typeof SchoolSchema>, '행정표준코드'> &
+// See https://github.com/open-circle/valibot/issues/1518#issuecomment-5490218549
+export type School = {
+	시도교육청코드: 시도교육청코드;
+	시도교육청명: string;
+	학교명: string;
+	영문학교명: string | null;
+	학교종류명: 학교종류명 | null;
+	시도명: string;
+	관할조직명: string;
+	설립명: 설립명 | null;
+	도로명우편번호: string | null;
+	도로명주소: string | null;
+	도로명상세주소: string | null;
+	전화번호: string | null;
+	홈페이지주소: string | null;
+	남녀공학구분명: 남녀공학구분명;
+	팩스번호: string | null;
+	고등학교구분명: 고등학교구분명 | null;
+	산업체특별학급존재여부: YN;
+	고등학교일반전문구분명: 고등학교일반전문구분명 | null;
+	특수목적고등학교계열명: string | null;
+	입시전후기구분명: 입시전후기구분명;
+	주야구분명: 주야구분명;
+	설립일자: string;
+	개교기념일: string;
+	수정일자: string;
+} &
 	// A union so `Array#filter` can narrow it.
 	({ 행정표준코드: string } | { 행정표준코드: null });
+
+type IsMutuallyAssignable<A, B> = A extends B ? (B extends A ? true : false) : false;
+type Expect<T extends true> = T;
+
+// @ts-expect-error
+// oxlint-disable-next-line no-unused-vars
+type SchoolMatchesInferredSchema = Expect<
+	IsMutuallyAssignable<
+		Omit<School, '행정표준코드'> & { 행정표준코드: string | null },
+		InferOutput<typeof SchoolSchema>
+	>
+>;
